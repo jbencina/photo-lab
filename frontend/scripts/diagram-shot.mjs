@@ -1,13 +1,13 @@
 // Exports the system diagram from the documentation site for the README
 // -> website/static/img/system-overview-<light|dark>.png
-// Usage (from frontend/):  DOCS_URL=http://localhost:3000 node scripts/diagram-shot.mjs
+// Usage (from frontend/):  DOCS_URL=http://localhost:3000/photo-lab node scripts/diagram-shot.mjs
 // Serve the docs first (cd website && npm start, or npm run build && npm run serve).
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { chromium } from 'playwright'
 
 const here = path.dirname(fileURLToPath(import.meta.url))
-const DOCS = process.env.DOCS_URL ?? 'http://localhost:3000'
+const DOCS = process.env.DOCS_URL ?? 'http://localhost:3000/photo-lab'
 const OUT = path.join(here, '../../website/static/img')
 
 const browser = await chromium.launch()

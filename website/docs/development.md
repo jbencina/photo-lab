@@ -65,7 +65,7 @@ Markdown files in `website/docs/`, and the sidebar is defined in `website/sideba
 ```bash
 cd website
 npm install
-npm start                              # dev server with live reload on :3000
+npm start                              # dev server with live reload on :3000/photo-lab/
 npm run build                          # static site in website/build (fails on broken links)
 ```
 

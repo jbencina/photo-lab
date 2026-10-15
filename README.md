@@ -20,8 +20,9 @@ There are no accounts and nothing leaves the machine.
 
 ![The library: a grid of photos with the search bar on top and the dock of filters at the bottom](website/static/img/screenshots/library.jpg)
 
-The full documentation, with screenshots, is a [Docusaurus](https://docusaurus.io/) site in `website/`:
-run `cd website && npm install && npm start` to read it locally (see `website/docs/` for the pages).
+The full documentation, with screenshots, is at **<https://jbencina.github.io/photo-lab/>**. It is a
+[Docusaurus](https://docusaurus.io/) site in `website/`: run `cd website && npm install && npm start` to
+read it locally (see `website/docs/` for the pages).
 
 ## Requirements
 

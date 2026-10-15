@@ -11,9 +11,10 @@ const config: Config = {
     v4: true,
   },
 
-  // Placeholder: set this to wherever the site is deployed.
-  url: 'https://example.com',
-  baseUrl: '/',
+  // GitHub Pages (.github/workflows/docs.yml). Locally the site is served under the same path,
+  // e.g. http://localhost:3000/photo-lab/.
+  url: 'https://jbencina.github.io',
+  baseUrl: '/photo-lab/',
 
   onBrokenLinks: 'throw',
   markdown: {
