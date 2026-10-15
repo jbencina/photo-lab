@@ -10,16 +10,17 @@ uv sync --extra local             # python env (without the extra: no PyTorch, r
 uv run pytest -q -m "not slow"    # fast tests (no GPU, no models)
 uvx ruff check .                  # lint (docstrings + unused names), must pass
 cd frontend && npm run build      # type-check + build the web UI
-cd website && npm run build       # build the documentation site (fails on broken links)
+cd docs && npm run build          # build the documentation site (fails on broken links)
 ```
 
 The slow tests need a GPU, the model weights and `PHOTOLIB_SAMPLE_DIR` (a folder of sample photos that
 is not in the repository); they are skipped without it.
 
-The documentation site in `website/docs/` covers the same ground as `README.md` in more detail. When
-you change behaviour that is documented, update both, and retake the screenshots
+The documentation site in `docs/` (pages in `docs/content/`) is the reference; `README.md` is a short
+overview that links to it (features, requirements, quick start, diagram). When you change behaviour
+that is documented, update the docs, and the README if it touches those sections. Retake the screenshots
 (`frontend/scripts/docs-shots.mjs`) when the UI changes visibly. The system diagram in the README is
-an export of `website/src/components/SystemDiagram`; re-export it (`frontend/scripts/diagram-shot.mjs`)
+an export of `docs/src/components/SystemDiagram`; re-export it (`frontend/scripts/diagram-shot.mjs`)
 when you change the component.
 
 ## Python style

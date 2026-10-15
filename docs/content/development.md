@@ -59,17 +59,17 @@ libnspr4`, `dpkg -x` both into a directory, and run the scripts with
 
 ## This documentation site
 
-The site is built with [Docusaurus](https://docusaurus.io/) and lives in `website/`. The pages are
-Markdown files in `website/docs/`, and the sidebar is defined in `website/sidebars.ts`.
+The site is built with [Docusaurus](https://docusaurus.io/) and lives in `docs/`. The pages are
+Markdown files in `docs/content/`, and the sidebar is defined in `docs/sidebars.ts`.
 
 ```bash
-cd website
+cd docs
 npm install
 npm start                              # dev server with live reload on :3000/photo-lab/
-npm run build                          # static site in website/build (fails on broken links)
+npm run build                          # static site in docs/build (fails on broken links)
 ```
 
-The screenshots in `website/static/img/screenshots/` come from `frontend/scripts/docs-shots.mjs`. Run
+The screenshots in `docs/static/img/screenshots/` come from `frontend/scripts/docs-shots.mjs`. Run
 it against a server with a tagged catalog and both models configured, so that the Admin page shows
 tagging as available. The script is read-only:
 

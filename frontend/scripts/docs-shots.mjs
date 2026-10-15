@@ -1,6 +1,6 @@
-// Screenshots for the documentation site -> website/static/img/screenshots/<name>.jpg
+// Screenshots for the documentation site -> docs/static/img/screenshots/<name>.jpg
 // Usage (from frontend/):  BASE_URL=http://localhost:8000 node scripts/docs-shots.mjs
-//   OUT=dir      output dir (default ../website/static/img/screenshots)
+//   OUT=dir      output dir (default ../docs/static/img/screenshots)
 //   PHOTO=id     photo shown in the lightbox and "similar" shots (default: the oldest photo tagged "dog")
 //   ONLY=a,b     only take the shots with these names
 // Read-only: it never likes, tags, refreshes or purges anything. Serve with a decision model so the
@@ -15,7 +15,7 @@ import { chromium } from 'playwright'
 
 const here = path.dirname(fileURLToPath(import.meta.url))
 const BASE = process.env.BASE_URL ?? 'http://localhost:8000'
-const OUT = path.resolve(process.env.OUT ?? path.join(here, '../../website/static/img/screenshots'))
+const OUT = path.resolve(process.env.OUT ?? path.join(here, '../../docs/static/img/screenshots'))
 const ONLY = process.env.ONLY?.split(',')
 const SEED = 7
 const CARD = 'main [role="button"][tabindex="0"]'

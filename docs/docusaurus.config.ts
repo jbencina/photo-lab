@@ -33,6 +33,7 @@ const config: Config = {
       'classic',
       {
         docs: {
+          path: 'content',
           routeBasePath: '/',
           sidebarPath: './sidebars.ts',
         },
