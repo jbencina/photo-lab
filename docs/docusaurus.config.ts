@@ -59,6 +59,7 @@ const config: Config = {
         {type: 'docSidebar', sidebarId: 'docs', position: 'left', label: 'Docs'},
         {to: '/cli', label: 'CLI', position: 'left'},
         {to: '/api', label: 'API', position: 'left'},
+        {href: 'https://github.com/jbencina/photo-lab', label: 'GitHub', position: 'right'},
       ],
     },
     prism: {
