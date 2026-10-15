@@ -2,6 +2,8 @@
 name = "photolib"
 version = "0.1.0"
 description = "Local photo catalog with EmbeddingGemma 2 semantic search"
+license = "GPL-3.0-or-later"
+license-files = ["LICENSE"]
 requires-python = ">=3.12,<3.13"
 dependencies = [
     "pillow>=11",

@@ -666,3 +666,9 @@ without root, Chromium may be missing `libnss3`/`libnspr4`. If so, run
   lightbox only shows propagation progress while it stays open (the job itself continues; Admin
   shows it), and the grid's hover data for other photos refreshes on the next search or reload. A `photolib refresh`/`tag` in a terminal and a
   run started from the web UI don't know about each other; avoid running both at once.
+
+## License
+
+photo-lib is licensed under the [GNU General Public License v3.0](LICENSE) or later. The models it
+downloads have their own licenses: see the licence note for d1-3B at the end of
+[Manual tags, suggestions and propagation](#manual-tags-suggestions-and-propagation).
