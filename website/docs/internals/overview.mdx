@@ -1,0 +1,45 @@
+---
+title: System overview
+---
+
+import SystemDiagram from '@site/src/components/SystemDiagram';
+
+# System overview
+
+photo-lib has two halves that share one folder of data. **Indexing** reads your photos and writes an
+index; the **server** reads that index and serves the web UI. Both call the same two models.
+
+<SystemDiagram />
+
+## Indexing
+
+Indexing runs when you set a catalog, run `photolib refresh` or `photolib tag`, or press **Refresh** in
+Admin. It only adds what is new, and both passes are resumable.
+
+1. The **embed pass** reads each new JPEG once. It stores the EXIF data, writes a thumbnail, extracts a
+   six-color palette, and asks EmbeddingGemma 2 for the image embedding.
+2. The **tag pass** ranks every label against the stored embedding, keeps the 20 best as candidates,
+   and asks d1-3B a yes/no question about each one at full resolution. See
+   [Subject tagging](subject-tagging.md).
+
+## Index
+
+Each catalog has its own index folder: one SQLite database and a folder of thumbnails. The database
+holds the photos and their EXIF data, embeddings, palettes, tags and labels, likes, and a full-text
+index for metadata search. Your photo folder is only ever read. See [Data layout](data-layout.md).
+
+## Server
+
+`photolib serve` is one FastAPI process. It keeps every embedding and palette in memory, so Query,
+similar and color search score the whole library in one pass (see [How search works](search.md)). For a
+Query search it sends the text to EmbeddingGemma first. It also runs **Retag all** and **Find in
+library** as background jobs, which load d1-3B for as long as they run.
+
+The same process serves the built web UI, the thumbnails, and the originals straight from your photo
+folder, so a phone on the LAN needs nothing but a browser.
+
+## Models
+
+Each model runs inside the photo-lib process on the GPU, or on another machine behind a URL, or not at
+all. EmbeddingGemma 2 stays loaded while the server runs; d1-3B is loaded only while tagging. See
+[Where the models run](../models.md).

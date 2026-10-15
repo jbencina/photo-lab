@@ -1,0 +1,84 @@
+@import 'tailwindcss';
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-mono: ui-monospace, 'SF Mono', 'JetBrains Mono', Menlo, Consolas, monospace;
+
+  /* Single accent: teal */
+  --color-accent-50: oklch(0.984 0.014 180.72);
+  --color-accent-100: oklch(0.953 0.051 180.801);
+  --color-accent-200: oklch(0.91 0.096 180.426);
+  --color-accent-300: oklch(0.855 0.138 181.071);
+  --color-accent-400: oklch(0.777 0.152 181.912);
+  --color-accent-500: oklch(0.704 0.14 182.503);
+  --color-accent-600: oklch(0.6 0.118 184.704);
+  --color-accent-700: oklch(0.511 0.096 186.391);
+  --color-accent-800: oklch(0.437 0.078 188.216);
+  --color-accent-900: oklch(0.386 0.063 188.416);
+  --color-accent-950: oklch(0.277 0.046 192.524);
+
+  --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    -webkit-tap-highlight-color: transparent;
+    font-feature-settings: 'cv11', 'ss01';
+    text-rendering: optimizeLegibility;
+  }
+  body {
+    @apply bg-zinc-50 text-zinc-900 antialiased dark:bg-zinc-950 dark:text-zinc-100;
+    min-height: 100dvh;
+  }
+  ::selection {
+    @apply bg-accent-200 text-accent-950 dark:bg-accent-800 dark:text-accent-50;
+  }
+  button,
+  [role='button'] {
+    cursor: pointer;
+  }
+  button:disabled {
+    cursor: not-allowed;
+  }
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-accent-500;
+  }
+  input[type='number']::-webkit-inner-spin-button,
+  input[type='number']::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  input[type='number'] {
+    -moz-appearance: textfield;
+  }
+  input[type='date']::-webkit-calendar-picker-indicator {
+    opacity: 0.5;
+    cursor: pointer;
+  }
+  .dark input[type='date']::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+  }
+}
+
+@utility tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+@utility scrollbar-thin {
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in oklab, currentColor 20%, transparent) transparent;
+}
+
+@utility no-scrollbar {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@utility field {
+  @apply h-11 w-full rounded-lg border border-zinc-200 bg-white px-3 text-sm text-zinc-900 shadow-xs transition-colors outline-none placeholder:text-zinc-400 hover:border-zinc-300 focus:border-accent-500 focus:ring-3 focus:ring-accent-500/15 md:h-9 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-100 dark:placeholder:text-zinc-500 dark:hover:border-zinc-700 dark:focus:border-accent-400 dark:focus:ring-accent-400/15;
+}

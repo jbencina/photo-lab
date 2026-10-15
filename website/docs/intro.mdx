@@ -1,0 +1,39 @@
+---
+slug: /
+title: Introduction
+sidebar_label: Introduction
+---
+
+# photo-lib
+
+photo-lib is a single-user photo catalog that runs on your own machine. Point it at a folder of JPEGs
+and browse them from any device on your network. There are no accounts, and nothing leaves the
+machine.
+
+![The library on a desktop browser](/img/screenshots/library.jpg)
+
+For every photo, photo-lib stores the EXIF data, a thumbnail, a color palette, an
+[EmbeddingGemma 2](https://huggingface.co/google/embeddinggemma-2) image embedding and subject tags
+from [LiquidAI d1-3B](https://huggingface.co/LiquidAI/d1-3B), in one SQLite file per photo folder.
+The web UI on top of that gives you:
+
+- **Query search**: describe the photo ("bird in flight") and get the best matches first.
+- **Metadata search**: file name, camera, lens and software.
+- **Subject tags**: EmbeddingGemma proposes labels from a vocabulary of about 150, and d1-3B confirms
+  them by looking at the full-resolution photo (pigeon, marigold, wild turkey, power lines…).
+- **Your own tags**: type a tag on any photo. Existing tags are suggested as you type, and a new tag
+  can be looked for in the rest of the library with one click.
+- **Filters**: subjects, liked, camera, lens, ISO, aperture, focal length and date.
+- **Color search** and **find similar**, and double-tap to like.
+
+The same UI works on a phone, in light and dark themes:
+
+<div className="phones">
+
+![The library on a phone](/img/screenshots/phone-library.jpg)
+![The library on a phone, dark theme](/img/screenshots/phone-library-dark.jpg)
+![A photo opened on a phone](/img/screenshots/phone-lightbox.jpg)
+
+</div>
+
+To install photo-lib and index your first folder, start with [Getting started](getting-started.md).

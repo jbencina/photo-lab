@@ -1,0 +1,47 @@
+/* Teal accent, the same as the web UI's. */
+:root {
+  --ifm-color-primary: #0d9488;
+  --ifm-color-primary-dark: #0c857a;
+  --ifm-color-primary-darker: #0b7e74;
+  --ifm-color-primary-darkest: #09685f;
+  --ifm-color-primary-light: #0ea396;
+  --ifm-color-primary-lighter: #0faa9c;
+  --ifm-color-primary-lightest: #11c0b0;
+  --ifm-code-font-size: 95%;
+  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
+}
+
+[data-theme='dark'] {
+  --ifm-color-primary: #2dd4bf;
+  --ifm-color-primary-dark: #1fcab4;
+  --ifm-color-primary-darker: #1dbfaa;
+  --ifm-color-primary-darkest: #189d8c;
+  --ifm-color-primary-light: #49d9c7;
+  --ifm-color-primary-lighter: #53dbca;
+  --ifm-color-primary-lightest: #73e2d4;
+  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
+}
+
+/* Screenshots: a thin border so light screenshots don't blend into the page. */
+.markdown img {
+  border: 1px solid var(--ifm-color-emphasis-300);
+  border-radius: 8px;
+}
+
+/* Phone screenshots, side by side and at about the size of a phone (MDX wraps the images in a <p>). */
+.phones > p {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: var(--ifm-leading);
+}
+
+.phones img {
+  width: 240px;
+  max-width: calc(50% - 0.5rem);
+}
+
+/* Reference lists (CLI, API): keep the code at the start of an item on its own visual line when it wraps. */
+.markdown li > code:first-child {
+  overflow-wrap: anywhere;
+}

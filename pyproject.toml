@@ -1,0 +1,64 @@
+[project]
+name = "photolib"
+version = "0.1.0"
+description = "Local photo catalog with EmbeddingGemma 2 semantic search"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "pillow>=11",
+    "numpy>=2",
+    "scikit-learn>=1.5",
+    "fastapi>=0.115",
+    "uvicorn[standard]>=0.30",
+    "typer>=0.12",
+    "rich>=13",
+    "python-multipart>=0.0.9",
+]
+
+[project.optional-dependencies]
+# Needed only to run a model in this process (`--embedding-model local` / `--decision-model local`).
+local = [
+    "torch>=2.9",
+    "torchvision",
+    "transformers>=5",
+    "sentence-transformers>=6.1.0",
+]
+
+[project.scripts]
+photolib = "photolib.cli:app"
+
+[dependency-groups]
+dev = [
+    "pytest>=8",
+    "httpx2>=2.13.1",
+]
+
+[build-system]
+requires = ["uv_build>=0.13.0,<0.14.0"]
+build-backend = "uv_build"
+
+[tool.uv.build-backend]
+module-name = "photolib"
+module-root = ""
+
+[tool.uv.sources]
+torch = [{ index = "pytorch-cu130" }]
+torchvision = [{ index = "pytorch-cu130" }]
+
+[[tool.uv.index]]
+name = "pytorch-cu130"
+url = "https://download.pytorch.org/whl/cu130"
+explicit = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = ["slow: needs the GPU model (deselect with -m 'not slow')"]
+
+[tool.ruff.lint]
+select = ["D", "F"]  # docstrings (Google style, see AGENTS.md) and pyflakes (unused or undefined names)
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["D100", "D101", "D102", "D103", "D107"]  # tests don't need docstrings; the ones they have are still checked
+"spikes/*" = ["D"]

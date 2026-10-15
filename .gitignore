@@ -1,0 +1,26 @@
+# Python
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+.pytest_cache/
+.venv
+
+# photo-lib runtime data + model weights
+data/
+models/
+
+# frontend
+node_modules
+frontend/dist
+frontend/qa-mock
+
+
+# local only: planning doc, Playwright screenshots, research spikes, and a scratch copy of a data dir
+# for trying out serving from a second machine (see "Index on one machine, serve from another")
+PLAN.md
+qa/screenshots/
+spikes/
+hosted/
