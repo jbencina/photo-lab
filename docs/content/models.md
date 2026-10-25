@@ -53,11 +53,13 @@ request.
 **Decisions**
 
 ```json
-POST {"model": "LiquidAI/d1-3B", "images": ["<base64 JPEG>"], "questions": {"q000": {"type": "noul", "instructions": "Is there a dog in this photo?"}}}
+POST {"model": "LiquidAI/d1-3B", "state": "", "images": ["data:image/jpeg;base64,<base64 JPEG>"], "questions": {"q000": {"type": "noul", "instructions": "Is there a dog in this photo?"}}}
 →    {"answers": {"q000": {"noul": 0.97}}}
 ```
 
-This is d1's `system_one` call as JSON. One request is sent per photo.
+This is d1's `system_one` call as JSON. `state` is always empty, and the image is sent as a JPEG data
+URL, scaled down to the `PHOTOLIB_TAG_SIZE` pixel cap (1 MP by default; see
+[Subject tagging](internals/subject-tagging.md)). One request is sent per photo.
 
 ## Mixing local and remote
 

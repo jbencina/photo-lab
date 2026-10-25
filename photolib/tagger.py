@@ -2,7 +2,7 @@
 
 d1 answers yes/no ("noul") questions about an image in ONE forward pass: the image is the shared trunk and
 each question is a branch that attends to the trunk and itself only, so questions don't compete and the
-cost is ~264 ms for the image + ~1.4 ms per question (RTX 4080, bf16, 1600 px input -> 6 tiles + thumbnail).
+cost is ~264 ms for the image + ~1.4 ms per question (RTX 4080, bf16, a 1600 px input is tiled: 6 tiles + thumbnail).
 P(yes) is read off the yes/no logits; nothing is generated.
 
 * Loaded from the local dir `models/d1-3B` (`PHOTOLIB_TAGGER_DIR` overrides) with `trust_remote_code=True`
@@ -14,6 +14,7 @@ P(yes) is read off the yes/no logits; nothing is generated.
 from __future__ import annotations
 
 import gc
+import math
 import threading
 from pathlib import Path
 from typing import Mapping, Sequence
@@ -26,23 +27,35 @@ from .labels import questions_for
 from .remote import RemoteModelError, image_b64, post_json
 
 
-def load_for_tagging(path: str | Path, max_side: int = config.TAG_MAX_SIDE) -> Image.Image:
+def load_for_tagging(path: str | Path, size: str | None = None) -> Image.Image:
     """Loads an image as d1 should see it.
 
-    d1's runner then bounds it to 1 MP and its processor tiles it (512 px tiles + a thumbnail).
+    The long edge is scaled so the image has at most `config.TAG_SIZES[size]` pixels; smaller images are
+    left as they are. d1's processor then tiles anything over 524,288 px (512 px tiles + a thumbnail).
 
     Args:
         path: The image file.
-        max_side: Cap for the long edge, in pixels.
+        size: A `config.TAG_SIZES` key: "original", "1mp" or "small". None uses `config.tag_size()`.
 
     Returns:
-        An EXIF-oriented RGB image at native resolution, downscaled only when it exceeds `max_side`.
+        An EXIF-oriented RGB image within the pixel cap.
+
+    Raises:
+        ValueError: If `size` is not a `config.TAG_SIZES` key.
     """
+    size = size or config.tag_size()
+    if size not in config.TAG_SIZES:
+        raise ValueError(f"unknown tag size {size!r} (expected one of {', '.join(config.TAG_SIZES)})")
+    max_pixels = config.TAG_SIZES[size]
     with Image.open(path) as im:
-        im.draft("RGB", (max_side, max_side))  # cheap DCT downscale only for JPEGs much larger than max_side
+        scale = 1.0 if max_pixels is None else min(1.0, math.sqrt(max_pixels / (im.width * im.height)))
+        if scale < 1.0:
+            long_edge = math.ceil(max(im.size) * scale)
+            im.draft("RGB", (long_edge, long_edge))  # cheap DCT downscale, never below the target size
         im = ImageOps.exif_transpose(im).convert("RGB")
-    if max(im.size) > max_side:
-        im.thumbnail((max_side, max_side), Image.Resampling.LANCZOS)
+    if scale < 1.0:
+        w, h = (math.floor(d * math.sqrt(max_pixels / (im.width * im.height))) for d in im.size)
+        im = im.resize((w, h), Image.Resampling.LANCZOS)
     return im
 
 
@@ -153,8 +166,8 @@ class Tagger:
 class RemoteTagger:
     """d1-3B on another machine (`--decision-model URL`): same methods as `Tagger`.
 
-    The request is d1's own `system_one` call as JSON: POST {model, images: [base64 JPEG], questions:
-    {id: {type: "noul", instructions}}} -> {answers: {id: {noul: P(yes)}}}.
+    The request is d1's own `system_one` call as JSON: POST {model, state: "", images: [JPEG data URL],
+    questions: {id: {type: "noul", instructions}}} -> {answers: {id: {noul: P(yes)}}}.
 
     Attributes:
         url: The decision endpoint, used exactly as given.
@@ -188,7 +201,9 @@ class RemoteTagger:
             return {}
         questions = questions_for(labels, questions)
         schema = {f"q{i:03d}": {"type": "noul", "instructions": questions[lb]} for i, lb in enumerate(labels)}
-        r = post_json(self.url, {"model": config.TAGGER_NAME, "images": [image_b64(image)], "questions": schema})
+        image_url = "data:image/jpeg;base64," + image_b64(image)
+        payload = {"model": config.TAGGER_NAME, "state": "", "images": [image_url], "questions": schema}
+        r = post_json(self.url, payload)
         try:
             return {lb: float(r["answers"][f"q{i:03d}"]["noul"]) for i, lb in enumerate(labels)}
         except (KeyError, TypeError, ValueError) as e:

@@ -35,3 +35,40 @@ def test_d1_on_sample_images(sample_dir):
     else:
         t.unload()
         assert not t.loaded
+
+
+@pytest.mark.parametrize(
+    ("size", "max_pixels"), [("original", None), ("1mp", 1_000_000), ("small", 524_288)]
+)
+def test_load_for_tagging_sizes(tmp_path, size, max_pixels):
+    """Each tag size caps the pixel count by scaling the long edge, keeps the aspect ratio, and never upscales."""
+    from PIL import Image
+
+    from photolib.tagger import load_for_tagging
+
+    big = tmp_path / "big.jpg"
+    Image.new("RGB", (3000, 2000), "red").save(big)
+    im = load_for_tagging(big, size)
+    if max_pixels is None:
+        assert im.size == (3000, 2000)
+    else:
+        w, h = im.size
+        assert w * h <= max_pixels
+        assert w * h > 0.99 * max_pixels  # as large as the cap allows
+        assert abs(w / h - 1.5) < 0.01
+
+    tiny = tmp_path / "tiny.jpg"
+    Image.new("RGB", (300, 200), "red").save(tiny)
+    assert load_for_tagging(tiny, size).size == (300, 200)
+
+
+def test_load_for_tagging_rejects_unknown_size(tmp_path):
+    """An unknown tag size is an error, not a silent default."""
+    from PIL import Image
+
+    from photolib.tagger import load_for_tagging
+
+    p = tmp_path / "a.jpg"
+    Image.new("RGB", (10, 10)).save(p)
+    with pytest.raises(ValueError):
+        load_for_tagging(p, "huge")

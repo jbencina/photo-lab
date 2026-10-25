@@ -120,7 +120,8 @@ def test_remote_tagger(stub, monkeypatch):
     probs = t.tag(Image.new("RGB", (32, 32)), ["dog", "cat"], {"cat": "Is a cat visible?"})
     assert probs == {"dog": 0.9, "cat": 0.1}
     _, body = stub.seen[-1]
-    assert body["model"] == config.TAGGER_NAME and len(body["images"]) == 1
+    assert body["model"] == config.TAGGER_NAME and body["state"] == ""
+    assert len(body["images"]) == 1 and body["images"][0].startswith("data:image/jpeg;base64,")
     assert body["questions"]["q001"] == {"type": "noul", "instructions": "Is a cat visible?"}
     t.unload()  # no-op
 

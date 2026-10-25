@@ -29,7 +29,11 @@ COLOR_K = 6
 # Subject tagging: hybrid EG top-K candidates -> d1-3B yes/no (see subjects.py)
 TAGGER_NAME = "LiquidAI/d1-3B"
 TAGGER_SHORT = "d1-3B"  # stored in images.tagger
-TAG_MAX_SIDE = 1600  # full resolution (capped): small distant birds need the tiled full-res view
+# Pixel cap for the image d1 sees (the long edge is scaled to fit; nothing is saved). d1 itself bounds
+# images to 1 MP, and anything over 524,288 px is tiled, which costs ~3x the image tokens.
+TAG_SIZES: dict[str, int | None] = {"original": None, "1mp": 1_000_000, "small": 524_288}
+TAG_SIZE_ENV = "PHOTOLIB_TAG_SIZE"
+TAG_SIZE_DEFAULT = "1mp"
 TAG_CANDIDATES = 20  # EG top-K labels that d1 verifies
 TAG_THRESHOLD = 0.8  # keep labels with d1 P(yes) >= this
 TAG_SECONDS_ESTIMATE = 0.3  # per photo on the reference GPU (used for UI estimates only)
@@ -153,6 +157,11 @@ def model_dir() -> Path:
     """Returns the EmbeddingGemma weights dir (`PHOTOLIB_MODEL_DIR`, default `models/embeddinggemma-2`)."""
     env = os.environ.get("PHOTOLIB_MODEL_DIR")
     return Path(env).expanduser().resolve() if env else (_BASE / "models" / "embeddinggemma-2").resolve()
+
+
+def tag_size() -> str:
+    """Returns the tag size setting (`PHOTOLIB_TAG_SIZE`, default "1mp"), one of `TAG_SIZES`."""
+    return os.environ.get(TAG_SIZE_ENV) or TAG_SIZE_DEFAULT
 
 
 def tagger_dir() -> Path:

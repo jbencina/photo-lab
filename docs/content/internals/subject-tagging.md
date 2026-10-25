@@ -12,9 +12,16 @@ sample photos, where it named the main subject on 31 of 31 photos with no false 
 1. **EmbeddingGemma proposes.** Every label in the vocabulary is embedded once (`SearchQuery` prompt).
    For each photo, the cosine against all labels is a cheap matrix product over the stored embedding;
    the **top 20** become candidates.
-2. **d1-3B confirms.** The photo is loaded at native resolution (EXIF-rotated, capped at 1600 px; d1
-   bounds it to 1 MP and tiles it, which is what makes small, distant birds work) and d1 answers the 20
-   yes/no questions ("Is there a pigeon in this photo?") in **one forward pass**. The questions don't
+2. **d1-3B confirms.** The photo is loaded EXIF-rotated and scaled down to the pixel cap set by
+   `PHOTOLIB_TAG_SIZE` (the scaled copy is only used for d1 and never saved):
+   - `1mp` (the default): at most 1,000,000 px. d1 bounds every image to 1 MP itself, so larger
+     photos would only cost upload time. Above 524,288 px d1 tiles the image (512 px tiles plus a
+     thumbnail), which is what makes small, distant birds work.
+   - `small`: at most 524,288 px, so d1 doesn't tile. That's about 3 times cheaper per photo, but small
+     subjects can be missed.
+   - `original`: sent as is.
+
+   d1 then answers the 20 yes/no questions ("Is there a pigeon in this photo?") in **one forward pass**. The questions don't
    compete with each other, and P(yes) is sharp: things that are present score about 0.98, absent ones
    about 0.02.
 3. Every candidate with **P(yes) ≥ 0.8** is kept. They are ranked by EmbeddingGemma's cosine
