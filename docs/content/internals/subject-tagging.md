@@ -14,11 +14,11 @@ sample photos, where it named the main subject on 31 of 31 photos with no false 
    the **top 20** become candidates.
 2. **d1-3B confirms.** The photo is loaded EXIF-rotated and scaled down to the pixel cap set by
    `PHOTOLIB_TAG_SIZE` (the scaled copy is only used for d1 and never saved):
-   - `1mp` (the default): at most 1,000,000 px. d1 bounds every image to 1 MP itself, so larger
-     photos would only cost upload time. Above 524,288 px d1 tiles the image (512 px tiles plus a
-     thumbnail), which is what makes small, distant birds work.
-   - `small`: at most 524,288 px, so d1 doesn't tile. That's about 3 times cheaper per photo, but small
-     subjects can be missed.
+   - `small` (the default): at most 524,288 px, so d1 doesn't tile. That's about 3 times cheaper per
+     photo, but small subjects can be missed.
+   - `1mp`: at most 1,000,000 px. d1 bounds every image to 1 MP itself, so larger photos would only
+     cost upload time. Above 524,288 px d1 tiles the image (512 px tiles plus a thumbnail), which is
+     what makes small, distant birds work.
    - `original`: sent as is.
 
    d1 then answers the 20 yes/no questions ("Is there a pigeon in this photo?") in **one forward pass**. The questions don't

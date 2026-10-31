@@ -33,7 +33,7 @@ TAGGER_SHORT = "d1-3B"  # stored in images.tagger
 # images to 1 MP, and anything over 524,288 px is tiled, which costs ~3x the image tokens.
 TAG_SIZES: dict[str, int | None] = {"original": None, "1mp": 1_000_000, "small": 524_288}
 TAG_SIZE_ENV = "PHOTOLIB_TAG_SIZE"
-TAG_SIZE_DEFAULT = "1mp"
+TAG_SIZE_DEFAULT = "small"
 TAG_CANDIDATES = 20  # EG top-K labels that d1 verifies
 TAG_THRESHOLD = 0.8  # keep labels with d1 P(yes) >= this
 TAG_SECONDS_ESTIMATE = 0.3  # per photo on the reference GPU (used for UI estimates only)
@@ -160,7 +160,7 @@ def model_dir() -> Path:
 
 
 def tag_size() -> str:
-    """Returns the tag size setting (`PHOTOLIB_TAG_SIZE`, default "1mp"), one of `TAG_SIZES`."""
+    """Returns the tag size setting (`PHOTOLIB_TAG_SIZE`, default "small"), one of `TAG_SIZES`."""
     return os.environ.get(TAG_SIZE_ENV) or TAG_SIZE_DEFAULT
 
 
