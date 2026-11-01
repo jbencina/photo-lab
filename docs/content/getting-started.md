@@ -8,7 +8,7 @@ title: Getting started
 
 - Linux or WSL2 (developed on WSL2 Ubuntu).
 - [uv](https://docs.astral.sh/uv/). It installs Python 3.12 and, with `--extra local`, PyTorch.
-- Node.js 20+ and npm, to build the web UI.
+- Node.js 20+ and npm. `serve` uses them to build the web UI.
 - An NVIDIA GPU is strongly recommended. With CUDA, both models run in bfloat16. Without a GPU they
   run on the CPU in float32: search still works, but tagging a large library becomes impractical
   (d1-3B alone needs about 12.5 GB of RAM in fp32).
@@ -28,10 +28,10 @@ uvx hf download LiquidAI/d1-3B --local-dir models/d1-3B      # subject tagger (L
 
 # 2. python env (the `local` extra is PyTorch + transformers, needed to run the models on this machine)
 uv sync --extra local
-
-# 3. web UI
-cd frontend && npm install && npm run build && cd ..
 ```
+
+Without `--extra local` you get a light install with no PyTorch, for when both models run on another
+machine (see [Where the models run](models.md)).
 
 ## Index a folder and serve it
 
@@ -54,8 +54,10 @@ Tagging (d1) ━━━━━━━━━━━━━━━━━━━━━ 31/
 
 Open [http://localhost:8000](http://localhost:8000). From now on,
 `uv run photolib serve --embedding-model local --decision-model local` is the only command you need:
-it serves both the API and the built UI (`frontend/dist`). If the UI hasn't been built, `serve`
-prints a warning and the API still works under `/api`.
+it serves both the API and the web UI. The first time, `serve` builds the UI into `frontend/dist`
+with npm (`npm ci`, then `npm run build`), and it builds again whenever the
+UI's sources are newer than the build, for example after a `git pull`. `--no-build-ui` skips that. If
+npm isn't installed or the build fails, `serve` prints a warning and the API still works under `/api`.
 
 To browse from a phone or another computer, see [Phone and other devices](guide/phone.md).
 

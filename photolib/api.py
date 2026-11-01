@@ -481,7 +481,7 @@ def spa(full_path: str, request: Request):
     index = dist / "index.html"
     if not index.is_file():
         return JSONResponse(
-            {"detail": "frontend not built (run `npm run build` in frontend/)", "api": "/api/status"},
+            {"detail": "frontend not built (`photolib serve` builds it when npm is installed)", "api": "/api/status"},
             status_code=404,
         )
     if full_path:

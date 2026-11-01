@@ -21,9 +21,10 @@ The slow tests run the real models on a private set of sample photos that is not
 repository: point `PHOTOLIB_SAMPLE_DIR` at a folder of photos to run them; without it they are skipped.
 The same goes for the file names in `frontend/scripts/e2e-tags.mjs`.
 
-`PHOTOLIB_FRONTEND_DIST=<dir>` makes `serve` use a UI build from another folder
-(`npm run build -- --outDir <dir> --emptyOutDir`), which lets you try a new build without replacing the
-`frontend/dist` a running server is serving. The mock API (`npm run mock`) doesn't implement the tag
+`serve` rebuilds `frontend/dist` when a UI source is newer than the build, so restarting it after a UI
+change is enough. `PHOTOLIB_FRONTEND_DIST=<dir>` makes `serve` use a UI build from another folder
+(`npm run build -- --outDir <dir> --emptyOutDir`) and turns the rebuild off, which lets you try a new
+build without replacing the `frontend/dist` a running server is serving. The mock API (`npm run mock`) doesn't implement the tag
 endpoints.
 
 ## Browser QA scripts

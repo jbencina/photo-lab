@@ -22,7 +22,7 @@ There are no accounts and nothing leaves the machine.
 
 ## Requirements
 
-- Linux or WSL2, [uv](https://docs.astral.sh/uv/), and Node.js 20+ to build the web UI.
+- Linux or WSL2, [uv](https://docs.astral.sh/uv/), and Node.js 20+ (`serve` uses npm to build the web UI).
 - An NVIDIA GPU with about 9 GB of free VRAM for tagging (search alone needs about 2 GB). Without one,
   everything runs on the CPU, but tagging a large library becomes impractical.
 - About 8.5 GB of disk for the model weights.
@@ -37,13 +37,11 @@ Either model can also run on another machine behind a URL; see
 uvx hf download google/embeddinggemma-2 --local-dir models/embeddinggemma-2
 uvx hf download LiquidAI/d1-3B --local-dir models/d1-3B
 
-# 2. python env (the `local` extra is PyTorch + transformers, to run the models on this machine)
+# 2. python env (the `local` extra is PyTorch + transformers, to run the models on this machine;
+#    leave it out when both models run on another machine)
 uv sync --extra local
 
-# 3. web UI
-cd frontend && npm install && npm run build && cd ..
-
-# 4. index a folder and serve
+# 3. index a folder and serve (the first serve builds the web UI with npm)
 uv run photolib catalog set /path/to/photos --embedding-model local --decision-model local
 uv run photolib serve --embedding-model local --decision-model local
 ```

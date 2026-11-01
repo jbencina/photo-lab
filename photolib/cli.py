@@ -502,23 +502,39 @@ def serve(
     port: int = typer.Option(8000, help="Port."),
     reload: bool = typer.Option(False, "--reload", help="Auto-reload on code changes (dev)."),
     warmup: bool = typer.Option(True, "--warmup/--no-warmup", help="Load the model in the background at startup."),
+    build_ui: bool = typer.Option(
+        True, "--build-ui/--no-build-ui", help="Build the web UI with npm first if it is missing or out of date."
+    ),
     embedding_model: str | None = _embedding_option(),
     decision_model: str | None = _decision_option(),
 ):
-    """Run the API + web UI. Without --embedding-model / --decision-model the UI hides what needs them."""
+    """Run the API + web UI. Without --embedding-model / --decision-model the UI hides what needs them.
+
+    The web UI in frontend/ is built with npm (Node.js 20+) on the first run, and again whenever its
+    sources are newer than the build, e.g. after a git pull.
+    """
     import socket
+    import subprocess
 
     import uvicorn
+
+    from . import webui
 
     _use_models(embedding_model, decision_model)
     for name, setting in (("Embedding model", config.embedding_model()), ("Decision model", config.decision_model())):
         console.print(f"{name}: " + ("[yellow]not available[/]" if setting is None else f"[bold]{setting}[/]"))
 
+    src = webui.frontend_dir()
+    if build_ui and src is not None and webui.needs_build(src):
+        console.print("Building the web UI (npm)...")
+        try:
+            webui.build(src)
+        except FileNotFoundError:
+            console.print("[yellow]npm not found:[/] install Node.js 20+ to build the web UI.")
+        except subprocess.CalledProcessError:
+            console.print("[yellow]Building the web UI failed[/] (see npm's output above).")
     if not (config.frontend_dist() / "index.html").is_file():
-        console.print(
-            "[yellow]Web UI not built:[/] run [bold]cd frontend && npm install && npm run build[/] "
-            "(the API still works under /api)."
-        )
+        console.print("[yellow]Web UI not built[/] (the API still works under /api).")
     lan = None
     try:  # best-effort LAN address (no packets are sent for a UDP connect)
         with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:

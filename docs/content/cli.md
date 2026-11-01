@@ -122,10 +122,14 @@ label count, device and dtype.
 uv run photolib status
 ```
 
-### `serve [--host 0.0.0.0] [--port 8000] [--reload] [--no-warmup]`
+### `serve [--host 0.0.0.0] [--port 8000] [--reload] [--no-warmup] [--no-build-ui]`
 
 Runs the API and the web UI. By default it loads the embedding model in the background at startup,
 so the first query is fast; `--no-warmup` skips that.
+
+Before starting, it builds the web UI with npm if `frontend/dist` is missing or older than the UI's
+sources (`npm ci` first when `node_modules` is missing or older than `package-lock.json`).
+`--no-build-ui` skips that, and so does `PHOTOLIB_FRONTEND_DIST`.
 
 ```bash
 uv run photolib serve --port 8080
