@@ -73,6 +73,56 @@ def to_hex(rgb) -> str:
     return f"#{r:02x}{g:02x}{b:02x}"
 
 
+def _sq_dists(x: np.ndarray, x_sq: np.ndarray, centers: np.ndarray) -> np.ndarray:
+    """Returns the squared distance from every point to every center, shape (n, k)."""
+    d2 = x_sq[:, None] - 2.0 * (x @ centers.T) + (centers * centers).sum(axis=1)[None]
+    return np.maximum(d2, 0.0)
+
+
+def _kmeans(x: np.ndarray, k: int, n_init: int = 3, max_iter: int = 300, seed: int = 0) -> np.ndarray:
+    """Clusters points with k-means (k-means++ seeding, Lloyd iterations) and keeps the best of `n_init` runs.
+
+    A run stops when the centers move less than 1e-4 of the data's variance, as in scikit-learn.
+
+    Args:
+        x: Points, shape (n, d).
+        k: Number of clusters; at most the number of distinct points.
+        n_init: Number of runs with different seeds; the one with the lowest inertia wins.
+        max_iter: Iteration cap per run.
+        seed: Seed for the random generator, so the same image always gets the same palette.
+
+    Returns:
+        The cluster index of each point, shape (n,).
+    """
+    rng = np.random.default_rng(seed)
+    n, dim = x.shape
+    x_sq = (x * x).sum(axis=1)
+    tol = 1e-4 * float(x.var(axis=0).mean())
+    best_labels, best_inertia = None, np.inf
+    for _ in range(n_init):
+        centers = x[[rng.integers(n)]]
+        closest = _sq_dists(x, x_sq, centers)[:, 0]
+        for _ in range(1, k):
+            c = x[rng.choice(n, p=closest / closest.sum())]
+            centers = np.vstack([centers, c])
+            closest = np.minimum(closest, _sq_dists(x, x_sq, c[None])[:, 0])
+        for _ in range(max_iter):
+            labels = _sq_dists(x, x_sq, centers).argmin(axis=1)
+            counts = np.bincount(labels, minlength=k)
+            sums = np.stack([np.bincount(labels, weights=x[:, j], minlength=k) for j in range(dim)], axis=1)
+            new = np.where(counts[:, None] > 0, sums / np.maximum(counts, 1)[:, None], centers)
+            shift = float(((new - centers) ** 2).sum())
+            centers = new
+            if shift <= tol:
+                break
+        d2 = _sq_dists(x, x_sq, centers)
+        labels = d2.argmin(axis=1)
+        inertia = float(d2[np.arange(n), labels].sum())
+        if inertia < best_inertia:
+            best_labels, best_inertia = labels, inertia
+    return best_labels
+
+
 def palette(img: Image.Image, k: int = config.COLOR_K) -> list[dict]:
     """Extracts an image's dominant colors with k-means in CIELAB.
 
@@ -85,16 +135,13 @@ def palette(img: Image.Image, k: int = config.COLOR_K) -> list[dict]:
     Returns:
         A list of `{hex, lab: [L, a, b], share}` dicts, largest share first.
     """
-    from sklearn.cluster import KMeans
-
     small = img.convert("RGB")
     small.thumbnail((config.COLOR_SAMPLE_SIDE, config.COLOR_SAMPLE_SIDE), Image.Resampling.BILINEAR)
     rgb = np.asarray(small, dtype=np.float64).reshape(-1, 3)
     lab = rgb_to_lab(rgb)
     n_unique = len(np.unique(rgb.astype(np.uint8), axis=0))
     k = max(1, min(k, n_unique))
-    km = KMeans(n_clusters=k, n_init=3, random_state=0).fit(lab)
-    labels = km.labels_
+    labels = _kmeans(lab, k)
     out = []
     for i in range(k):
         mask = labels == i

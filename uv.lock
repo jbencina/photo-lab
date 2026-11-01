@@ -621,7 +621,6 @@ dependencies = [
     { name = "pillow" },
     { name = "python-multipart" },
     { name = "rich" },
-    { name = "scikit-learn" },
     { name = "typer" },
     { name = "uvicorn", extra = ["standard"] },
 ]
@@ -647,7 +646,6 @@ requires-dist = [
     { name = "pillow", specifier = ">=11" },
     { name = "python-multipart", specifier = ">=0.0.9" },
     { name = "rich", specifier = ">=13" },
-    { name = "scikit-learn", specifier = ">=1.5" },
     { name = "sentence-transformers", marker = "extra == 'local'", specifier = ">=6.1.0" },
     { name = "torch", marker = "extra == 'local'", specifier = ">=2.9", index = "https://download.pytorch.org/whl/cu130" },
     { name = "torchvision", marker = "extra == 'local'", index = "https://download.pytorch.org/whl/cu130" },
